@@ -6,7 +6,7 @@ import static org.mockito.Mockito.verify;
 
 import java.util.List;
 import java.util.Optional;
-import microservices.book.gamification.challenge.ChallengeSolvedDTO;
+import microservices.book.gamification.challenge.ChallengeSolvedEvent;
 import microservices.book.gamification.game.GameService.GameResult;
 import microservices.book.gamification.game.badgeprocessors.BadgeProcessor;
 import microservices.book.gamification.game.domain.BadgeCard;
@@ -40,7 +40,7 @@ class GameServiceTest {
   void testCorrectAttemptForUser() {
     // given
     Long userId = 100L, attemptId = 1L;
-    ChallengeSolvedDTO attempt = new ChallengeSolvedDTO(attemptId, true, 1, 2, userId,
+    ChallengeSolvedEvent attempt = new ChallengeSolvedEvent(attemptId, true, 1, 2, userId,
         "jackie");
     ScoreCard exptectedScoreCard = new ScoreCard(userId, attemptId);
     given(scoreCardRepository.getTotalScoreForUser(userId))
@@ -66,10 +66,10 @@ class GameServiceTest {
   @Test
   void testIncorrectAttemptForUser() {
     // given
-    ChallengeSolvedDTO challengeSolvedDTO = new ChallengeSolvedDTO(2L, false, 1, 2, 100L, "jackie");
+    ChallengeSolvedEvent challengeSolvedEvent = new ChallengeSolvedEvent(2L, false, 1, 2, 100L, "jackie");
 
     // when
-    GameResult result = gameService.newAttemptForUser(challengeSolvedDTO);
+    GameResult result = gameService.newAttemptForUser(challengeSolvedEvent);
 
     // then
     assertEquals(new GameResult(0, List.of()), result);

@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import java.util.Optional;
-import microservices.book.gamification.challenge.ChallengeSolvedDTO;
+import microservices.book.gamification.challenge.ChallengeSolvedEvent;
 import microservices.book.gamification.game.domain.BadgeType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,14 +21,14 @@ public class LuckyNumberBadgeProcessorTest {
   @Test
   public void shouldGiveBadgeWhenLuckyNumbersMet() {
     Optional<BadgeType> badgeType = badgeProcessor.processForOptionalBadge(10, List.of(),
-        new ChallengeSolvedDTO(1L, true, 42, 1, 1L, null));
+        new ChallengeSolvedEvent(1L, true, 42, 1, 1L, null));
     assertThat(badgeType).contains(BadgeType.LUCKY_NUMBER);
   }
 
   @Test
   public void shouldNotGiveBadgeWhenLuckyNumbersNotMet() {
     Optional<BadgeType> badgeType = badgeProcessor.processForOptionalBadge(10, List.of(),
-        new ChallengeSolvedDTO(1L, true, 43, 12, 1L, null));
+        new ChallengeSolvedEvent(1L, true, 43, 12, 1L, null));
     assertThat(badgeType).isEmpty();
   }
 }

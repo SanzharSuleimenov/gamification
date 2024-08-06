@@ -1,6 +1,6 @@
 package microservices.book.gamification.challenge;
 
-public record ChallengeSolvedDTO(
+public record ChallengeSolvedEvent(
     long attemptId,
     boolean correct,
     int factorA,

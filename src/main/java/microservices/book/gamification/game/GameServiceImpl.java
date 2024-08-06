@@ -6,7 +6,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import microservices.book.gamification.challenge.ChallengeSolvedDTO;
+import microservices.book.gamification.challenge.ChallengeSolvedEvent;
 import microservices.book.gamification.game.badgeprocessors.BadgeProcessor;
 import microservices.book.gamification.game.domain.BadgeCard;
 import microservices.book.gamification.game.domain.BadgeType;
@@ -23,25 +23,26 @@ public class GameServiceImpl implements GameService {
   private final List<BadgeProcessor> badgeProcessors;
 
   @Override
-  public GameResult newAttemptForUser(ChallengeSolvedDTO challenge) {
-    if (challenge.correct()) {
-      ScoreCard scoreCard = new ScoreCard(challenge.userId(), challenge.attemptId());
-      scoreCardRepository.save(scoreCard);
-      log.info("User {} scored {} points for attempt id {}", challenge.userAlias(),
-          challenge.attemptId(), challenge.userId());
-      List<BadgeCard> badgeCards = processForBadges(challenge);
-
-      return new GameResult(scoreCard.getScore(), badgeCards
-          .stream().map(BadgeCard::getBadgeType).toList());
-    } else {
+  public GameResult newAttemptForUser(ChallengeSolvedEvent challenge) {
+    if (!challenge.correct()) {
       log.info("Attempt id {} is not correct. User {} doesn't get score.", challenge.attemptId(),
           challenge.userAlias());
 
       return new GameResult(0, List.of());
     }
+
+    ScoreCard scoreCard = new ScoreCard(challenge.userId(), challenge.attemptId());
+    scoreCardRepository.save(scoreCard);
+
+    log.info("User {} scored {} points for attempt id {}", challenge.userAlias(),
+        challenge.attemptId(), challenge.userId());
+    List<BadgeCard> badgeCards = processForBadges(challenge);
+
+    return new GameResult(scoreCard.getScore(), badgeCards
+        .stream().map(BadgeCard::getBadgeType).toList());
   }
 
-  private List<BadgeCard> processForBadges(final ChallengeSolvedDTO challenge) {
+  private List<BadgeCard> processForBadges(final ChallengeSolvedEvent challenge) {
     Optional<Integer> optTotalScore = scoreCardRepository.getTotalScoreForUser(challenge.userId());
     if (optTotalScore.isEmpty()) {
       return List.of();
